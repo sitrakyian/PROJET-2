@@ -66,7 +66,7 @@ def _maj_indicateurs():
                                  bg_color=VERT_SERVICE, fg_color=VERT_SVC_TXT)
     else:
         lbl_service_badge.configure(text="service impossible",
-                                 bg_color=ROUGE_SVC, fg_color=ROUGE_SVC_TX)
+                                 fg_color=ROUGE_BG, text_color=ROUGE_SVC_TX)
 
     for i, cat in enumerate(N.CATEGORIES):
         nb  = ind[cat]
@@ -393,8 +393,8 @@ Label(frame_notif,
 # ----------------------------------------------------------
 # ROW 1 : Rajout de'espace entre le bandeau d'alerte et le bloc services
 # ----------------------------------------------------------
-Frame(frame_entete, height=1
-      ).grid(row=3, column=0, sticky="ew", padx=12, pady=(0, 3))
+Frame(frame_entete, height=0, bg=BLANC
+      ).grid(row=3, column=0, sticky="ew", padx=12, pady=(0, 10))
 
 # ----------------------------------------------------------
 # ROW 3 : Bloc services
@@ -403,14 +403,16 @@ frame_services = Frame(ma_fenetre, bg=GRIS_FOND)
 frame_services.grid(row=3, column=0, sticky="ew", padx=12, pady=(6, 2))
 frame_services.columnconfigure(1, weight=1)
 
-Label(frame_services,
+frame_services_span = ctk.CTkFrame(frame_services, fg_color=BLANC ,corner_radius=5, border_color=GRIS_BORDURE, border_width=1)
+frame_services_span.grid(row=0, column=0, sticky="ew", padx=12,pady=0)
+ctk.CTkLabel(frame_services_span,
       textvariable=sv_services,
-      font=("Helvetica", 11), bg=BLANC, fg=NOIR_TITRE
-      ).grid(row=0, column=0, padx=16, pady=8, sticky="w")
+      font=("Helvetica", 11), text_color=NOIR_TITRE
+      ).grid(row=0, column=0, padx=16, pady=2, sticky="w")
 
 lbl_service_badge = ctk.CTkLabel(frame_services,
                            text="service impossible",
-                           bg_color=ROUGE_SVC, fg_color=ROUGE_SVC_TX,
+                           fg_color=ROUGE_BG, text_color=ROUGE_SVC_TX,
                            font=("Helvetica", 10, "bold"),
                            padx=10, pady=4, corner_radius=5)
 lbl_service_badge.grid(row=0, column=1, padx=12, pady=6, sticky="w")
@@ -428,29 +430,28 @@ lbl_cat_nb    = []
 for i, cat in enumerate(N.CATEGORIES):
     frame_cats.columnconfigure(i, weight=1)
 
-    bloc = Frame(frame_cats, bg=BLANC, bd=1, relief="groove",
-                 padx=12, pady=8)
+    bloc = ctk.CTkFrame(frame_cats, fg_color=BLANC, border_width=1, border_color=GRIS_BORDURE, corner_radius=5)
     bloc.grid(row=0, column=i, padx=8, pady=8, sticky="nsew")
     bloc.columnconfigure(1, weight=1)
 
     lbl_pt = Label(bloc, text="●", fg=ROUGE_KO,
                    font=("Helvetica", 14), bg=BLANC)
-    lbl_pt.grid(row=0, column=0, sticky="w")
+    lbl_pt.grid(row=0, column=0, sticky="w",padx=2,pady=2)
     lbl_cat_point.append(lbl_pt)
 
-    lbl_et = Label(bloc, text="MANQUE", fg=ROUGE_KO,
-                   font=("Helvetica", 8, "bold"), bg=BLANC)
-    lbl_et.grid(row=0, column=1, sticky="e")
+    lbl_et = Label(bloc, text="MANQUE", fg=NOIR, bg=ROUGE_BG,
+                   font=("Helvetica", 8, "bold"))
+    lbl_et.grid(row=0, column=1, sticky="e",padx=2,pady=2)
     lbl_cat_etat.append(lbl_et)
 
     Label(bloc, text=cat, font=("Helvetica", 10, "bold"),
           bg=BLANC, fg=NOIR_TITRE, anchor="w"
-          ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(4, 0))
+          ).grid(row=1, column=0, columnspan=2, sticky="w", padx=2, pady=(4, 0))
 
     lbl_nb = Label(bloc, text="0  0.0%",
                    font=("Helvetica", 9), fg=GRIS_TEXTE,
                    bg=BLANC, anchor="w")
-    lbl_nb.grid(row=2, column=0, columnspan=2, sticky="w")
+    lbl_nb.grid(row=2, column=0, columnspan=2, sticky="w", padx=2, pady=2)
     lbl_cat_nb.append(lbl_nb)
 
 # ----------------------------------------------------------
@@ -485,16 +486,15 @@ style.map("Repas.Treeview",
           background=[("selected", "#DBEAFE")],
           foreground=[("selected", NOIR_TITRE)])
 
-colonnes = ("Participants", "Categorie", "Nom de l'element", "Quantite")
+colonnes = ("Participants", "Categorie", "Nom de l'element", "Quantite", "Actions")
 tableau  = ttk.Treeview(frame_tableau, columns=colonnes,
                         show="headings", height=10,
                         style="Repas.Treeview")
 
 largeurs = {"Participants": 200, "Categorie": 120,
-            "Nom de l'element": 200, "Quantite": 90}
+            "Nom de l'element": 200, "Quantite": 90, "Actions": 90}
 for col in colonnes:
-    tableau.heading(col, text=col,
-                    command=lambda c=col: trier_colonne(c))
+    tableau.heading(col, text=col,command=lambda c=col: trier_colonne(c))
     tableau.column(col, width=largeurs[col], anchor="center", minwidth=60)
 
 tableau.grid(row=1, column=0, sticky="nsew")
