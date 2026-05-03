@@ -119,7 +119,7 @@ def calculer_nb_repas_possible():
 
 
 def verifier_repas_possible():
-    return calculer_nb_repas_possible() > 0
+    return len(participants) > 0 and calculer_nb_repas_possible() >= len(participants)
 
 
 def calculer_manquants():
