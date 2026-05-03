@@ -1,10 +1,3 @@
-# ============================================================
-# INTERFACE - Projet : Organisation de Repas Partagé
-# ============================================================
-# Design fidèle à la maquette du PDF (Partie II : Interface)
-# Toute la logique métier est dans lib/noyau.py
-# ============================================================
-
 from tkinter import *
 import customtkinter as ctk
 from tkinter import ttk
@@ -12,9 +5,8 @@ import noyau as N
 
 ctk.set_appearance_mode("Light")
 
-# ============================================================
-# PALETTE DE COULEURS (extraite du design PDF)
-# ============================================================
+# Palette de couleurs
+
 BLEU           = "#0080FF"
 BLEU_BOISSON   = "#0080FF"
 GRIS_FOND      = "#F9FAFB"
@@ -37,15 +29,11 @@ BLANC          = "#FFFFFF"
 NOIR           = "#000000"
 FOND_GLOBAL    = "#E7F6F7"
 
-# ============================================================
-# TRI GLOBAL
-# ============================================================
+
 tri_colonne   = "nom"
 tri_croissant = True
 
-# ============================================================
-# MISE A JOUR DE L INTERFACE
-# ============================================================
+# mise à jour de l'interface
 
 def mise_a_jour():
     _maj_compteurs()
@@ -70,7 +58,7 @@ def _maj_indicateurs():
         lbl_service_badge.configure(text="✓ Service possible",
                                   fg_color=VERT_OK, text_color=VERT_SVC_TXT)
     else:
-        lbl_service_badge.configure(text="✗ Service impossible",
+        lbl_service_badge.configure(text="X Service impossible",
                                   fg_color=ROUGE_BG, text_color=ROUGE_SVC_TX)
 
     for i, cat in enumerate(N.CATEGORIES):
@@ -107,23 +95,22 @@ def _maj_tableau():
     for i, p in enumerate(N.participants):
         tag = "evenrow" if i % 2 else "oddrow"
         tableau.insert("", END, iid=str(i),
-                       values=(p["nom"] + " " + p["prenom"],
+                       values=(p["nom"].upper() + " " + p["prenom"],
                                p["categorie"],
                                p["nom_element"],
-                               p["quantite"]),
+                               p["quantite"],
+                               "Modifier | Supprimer"),
                        tags=(tag,))
 
-
-# ============================================================
-# HELPERS FORMULAIRE
-# ============================================================
+# les helpers du formulaire
 
 def _ligne_champ(parent, row_num, libelle, sv):
     Label(parent, text=libelle, font=("Inter", 11),
           bg=BLANC, fg=NOIR_TITRE, anchor="w", width=20
           ).grid(row=row_num, column=0, padx=(24, 8), pady=7, sticky="w")
-    e = Entry(parent, textvariable=sv, width=34,
-              font=("Inter", 11), relief="solid", bd=1)
+    e = ctk.CTkEntry(parent, textvariable=sv, width=300, height=35,
+                    font=("Inter", 11), corner_radius=5, border_width=1,
+                    fg_color=BLANC, border_color=GRIS_BORDURE, text_color=NOIR_TITRE)
     e.grid(row=row_num, column=1, padx=(0, 24), pady=7, sticky="ew")
     return e
 
@@ -134,9 +121,12 @@ def _ligne_menu(parent, row_num, libelle, sv):
           ).grid(row=row_num, column=0, padx=(24, 8), pady=7, sticky="w")
     if sv.get() not in N.CATEGORIES:
         sv.set("selectionner une categorie...")
-    menu = OptionMenu(parent, sv, *N.CATEGORIES)
-    menu.config(font=("Inter", 11), bg=BLANC,
-                relief="solid", bd=1, highlightthickness=0, width=28)
+    menu = ctk.CTkComboBox(parent, variable=sv, values=N.CATEGORIES,
+                            font=("Inter", 11), width=300, height=35,
+                            corner_radius=5, border_width=1,
+                            fg_color=BLANC, border_color=GRIS_BORDURE, text_color=NOIR_TITRE,
+                            button_color=GRIS_BORDURE, button_hover_color=GRIS_BORDURE,
+                            state="readonly")
     menu.grid(row=row_num, column=1, padx=(0, 24), pady=7, sticky="ew")
     return menu
 
@@ -146,17 +136,14 @@ def _boutons_form(parent, row_num, texte_ok, cmd_ok, cmd_annuler, couleur_ok=Non
         couleur_ok = BLEU
     f = Frame(parent, bg=BLANC)
     f.grid(row=row_num, column=0, columnspan=2, pady=16)
-    Button(f, text=texte_ok, bg=couleur_ok, fg=BLANC,
-           font=("Inter", 12), width=14, relief="flat", cursor="hand2",
+    ctk.CTkButton(f, text=texte_ok, fg_color=couleur_ok, text_color=BLANC,
+           font=("Inter", 12), width=130, height=35, corner_radius=5, cursor="hand2",
            command=cmd_ok).grid(row=0, column=0, padx=16)
-    Button(f, text="Annuler", bg=GRIS_FOND, fg=NOIR_TITRE,
-           font=("Inter", 12), width=14, relief="flat", cursor="hand2",
+    ctk.CTkButton(f, text="Annuler", fg_color=GRIS_FOND, text_color=NOIR_TITRE,
+           font=("Inter", 12), width=130, height=35, corner_radius=5, cursor="hand2",
            command=cmd_annuler).grid(row=0, column=1, padx=16)
 
-
-# ============================================================
-# FORMULAIRE D AJOUT
-# ============================================================
+# les formulaires
 
 def ouvrir_formulaire_ajout():
     win = Toplevel(ma_fenetre)
@@ -209,11 +196,6 @@ def ouvrir_formulaire_ajout():
 
     _boutons_form(win, 7, "Ajouter", lambda: _ajouter(), lambda: win.destroy())
 
-
-# ============================================================
-# FORMULAIRE DE MODIFICATION
-# ============================================================
-
 def ouvrir_formulaire_modification(index):
     p   = N.participants[index]
     win = Toplevel(ma_fenetre)
@@ -259,11 +241,7 @@ def ouvrir_formulaire_modification(index):
             sv_erreur.set(res)
 
     _boutons_form(win, 7, "Modifier", lambda: _modifier(), lambda: win.destroy())
-
-
-# ============================================================
-# CONFIRMATION DE SUPPRESSION
-# ============================================================
+    
 
 def ouvrir_confirmation_suppression(index):
     p          = N.participants[index]
@@ -274,16 +252,17 @@ def ouvrir_confirmation_suppression(index):
     win.geometry("430x210")
     win.resizable(False, False)
     win.config(bg=BLANC)
+    win.columnconfigure(0, weight=1) # Permet de centrer les éléments dans la fenêtre
 
     Label(win, text="Confirmer la suppression",
           font=("Inter", 14, "bold"),
           bg=BLANC, fg=NOIR_TITRE
-          ).grid(row=0, column=0, columnspan=2, padx=20, pady=(20, 8), sticky="w")
+          ).grid(row=0, column=0, padx=20, pady=(20, 8), sticky="ew") # sticky="ew" pour centrer
 
     Label(win,
           text="Etes-vous sur de vouloir supprimer\n" + nom_prenom + " de la liste ?",
-          font=("Inter", 11), bg=BLANC, fg=GRIS_TEXTE, justify="left"
-          ).grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 16), sticky="w")
+          font=("Inter", 11), bg=BLANC, fg=GRIS_TEXTE, justify="center" # justify="center" pour le texte
+          ).grid(row=1, column=0, padx=20, pady=(0, 16), sticky="ew") # sticky="ew" pour centrer
 
     def _confirmer():
         N.supprimer_participant(index)
@@ -291,24 +270,24 @@ def ouvrir_confirmation_suppression(index):
         win.destroy()
 
     frame_btn = Frame(win, bg=BLANC)
-    frame_btn.grid(row=2, column=0, columnspan=2, pady=8)
+    frame_btn.grid(row=2, column=0, pady=8, sticky="ew") # sticky="ew" pour que le frame des boutons s'étende
+    
+    # Configuration des colonnes du frame des boutons pour centrer les boutons
+    frame_btn.columnconfigure(0, weight=1) # Colonne vide à gauche pour pousser les boutons au centre
+    frame_btn.columnconfigure(3, weight=1) # Colonne vide à droite
 
-    Button(frame_btn, text="Oui, supprimer",
-           bg=ROUGE_KO, fg=BLANC, font=("Inter", 12), width=14,
-           relief="flat", cursor="hand2",
+    ctk.CTkButton(frame_btn, text="Oui, supprimer",
+           fg_color=ROUGE_KO, text_color=BLANC, font=("Inter", 12), width=140,
+           height=35, corner_radius=5, cursor="hand2",
            command=lambda: _confirmer()
-           ).grid(row=0, column=0, padx=12)
+           ).grid(row=0, column=1, padx=12) # Placer le bouton dans la colonne 1
 
-    Button(frame_btn, text="Non",
-           bg=GRIS_FOND, fg=NOIR_TITRE, font=("Inter", 12), width=10,
-           relief="flat", cursor="hand2",
-           command=lambda: win.destroy()
-           ).grid(row=0, column=1, padx=12)
+    ctk.CTkButton(frame_btn, text="Non",
+           fg_color=GRIS_FOND, text_color=NOIR_TITRE, font=("Inter", 12), width=100,
+           height=35, corner_radius=5, cursor="hand2",
+           command=lambda: win.destroy()).grid(row=0, column=2, padx=12) # Placer le bouton dans la colonne 2
 
-
-# ============================================================
-# ACTIONS TABLEAU
-# ============================================================
+# les actions et interactions éffectuées sur le tableau
 
 def action_modifier():
     sel = tableau.selection()
@@ -321,10 +300,23 @@ def action_supprimer():
     if sel:
         ouvrir_confirmation_suppression(int(sel[0]))
 
+def on_click_tableau(event):
+    #Gère le clic sur la colonne Actions (colonne #5).
+    item = tableau.identify_row(event.y)
+    column = tableau.identify_column(event.x)
+    
+    if not item or column != "#5":
+        return
+        
+    # On récupère les coordonnées de la cellule pour séparer Modifier de Supprimer
+    x, y, width, height = tableau.bbox(item, column)
+    rel_x = event.x - x
+    
+    if rel_x < width / 2:
+        ouvrir_formulaire_modification(int(item))
+    else:
+        ouvrir_confirmation_suppression(int(item))
 
-# ============================================================
-# TRI DES COLONNES
-# ============================================================
 
 def trier_colonne(col):
     global tri_colonne, tri_croissant
@@ -343,10 +335,6 @@ def trier_colonne(col):
     mise_a_jour()
 
 
-# ============================================================
-# FENETRE PRINCIPALE
-# ============================================================
-
 ma_fenetre = Tk()
 ma_fenetre.title("Organisateur de Repas Partage")
 ma_fenetre.geometry("840x660")
@@ -361,9 +349,8 @@ sv_notif     = StringVar()
 sv_services  = StringVar()
 sv_services.set("0 services possibles")
 
-# ----------------------------------------------------------
+
 # ROW 0 : En-tete
-# ----------------------------------------------------------
 frame_entete = ctk.CTkFrame(ma_fenetre,
                             fg_color=BLANC,
                             border_color=GRIS_BORDURE,
@@ -373,7 +360,7 @@ frame_entete.grid(row=0, column=0, sticky="ew", padx=12, pady=(12, 5))
 frame_entete.columnconfigure(1, weight=1)
 
 Label(frame_entete,
-        text="Organisateur de Repas Partage",
+        text="Organisateur de Repas Partagé",
         font=("Inter", 15, "bold"),
         bg=BLANC, fg=NOIR_TITRE
         ).grid(row=0, column=0, pady=(15,2),padx=14, sticky="w")
@@ -391,9 +378,8 @@ ctk.CTkButton(frame_entete,
         cursor="hand2",command=lambda: ouvrir_formulaire_ajout()
         ).grid(row=0, column=2, padx=14,pady=5, rowspan=2)
 
-# ----------------------------------------------------------
+
 # ROW 0 : Bandeau d'alerte (masque par defaut)
-# ----------------------------------------------------------
 frame_notif = ctk.CTkFrame(frame_entete, fg_color=ROUGE_BG, border_width=2, border_color=ROUGE_KO, corner_radius=5)
 Label(frame_notif,
         textvariable=sv_notif,
@@ -401,16 +387,13 @@ Label(frame_notif,
         font=("Inter", 10)
         ).grid(row=2, column=0, padx=12, pady=6,  sticky="w")
 
-# ----------------------------------------------------------
-# ----------------------------------------------------------
-# ROW 1 : Rajout de'espace entre le bandeau d'alerte et le bloc services
-# ----------------------------------------------------------
+
+# ROW 1 : Rajout d'espace entre le bandeau d'alerte et le bloc services
 Frame(frame_entete, height=0, bg=BLANC
       ).grid(row=3, column=0, sticky="ew", padx=12, pady=(0, 10))
 
-# ----------------------------------------------------------
+
 # ROW 3 : Bloc services
-# ----------------------------------------------------------
 frame_services = Frame(ma_fenetre, bg=FOND_GLOBAL)
 frame_services.grid(row=3, column=0, sticky="ew", padx=12, pady=(6, 2))
 frame_services.columnconfigure(1, weight=1)
@@ -429,9 +412,8 @@ lbl_service_badge = ctk.CTkLabel(frame_services,
                            padx=10, pady=2, corner_radius=5,height=24)
 lbl_service_badge.grid(row=0, column=1, padx=12, pady=3, sticky="w",)
 
-# ----------------------------------------------------------
+
 # ROW 4 : Blocs indicateurs par categorie
-# ----------------------------------------------------------
 frame_cats = ctk.CTkFrame(ma_fenetre,fg_color=FOND_GLOBAL)
 frame_cats.grid(row=4, column=0, sticky="ew", padx=12, pady=4)
 
@@ -480,9 +462,8 @@ for i, cat in enumerate(N.CATEGORIES):
     lbl_pct.grid(row=2, column=1, columnspan=2, sticky="w", padx=2, pady=(4,2))
     lbl_cat_pct.append(lbl_pct)
 
-# ----------------------------------------------------------
+
 # ROW 5 : Tableau des participants
-# ----------------------------------------------------------
 frame_tableau = ctk.CTkFrame(ma_fenetre, fg_color=GRIS_FOND,corner_radius=5, border_color=GRIS_BORDURE, border_width=1)
 frame_tableau.grid(row=5, column=0, sticky="nsew", padx=12, pady=(4, 10))
 frame_tableau.columnconfigure(0, weight=1)
@@ -522,38 +503,20 @@ tableau.tag_configure("oddrow", background=BLANC)
 tableau.tag_configure("evenrow", background="#F3F4F6")
 
 largeurs = {"Participants": 200, "Categorie": 120,
-            "Nom de l'element": 200, "Quantite": 90, "Actions": 90}
+            "Nom de l'element": 200, "Quantite": 90, "Actions": 150}
 for col in colonnes:
     tableau.heading(col, text=col,command=lambda c=col: trier_colonne(c))
     tableau.column(col, width=largeurs[col], anchor="center", minwidth=60)
 
 tableau.grid(row=1, column=0, sticky="nsew", padx=12, pady=(0, 12))
+tableau.bind("<ButtonRelease-1>", on_click_tableau)
 
 scrollbar_v = Scrollbar(frame_tableau, orient="vertical",
                         command=tableau.yview)
 tableau.configure(yscrollcommand=scrollbar_v.set)
 scrollbar_v.grid(row=1, column=1, sticky="ns")
 
-# ----------------------------------------------------------
-# ROW 6 : Boutons Modifier / Supprimer
-# ----------------------------------------------------------
-frame_actions = Frame(frame_tableau, bg=GRIS_FOND)
-frame_actions.grid(row=6, column=0, sticky="w", padx=12, pady=(4,10))
 
-Button(frame_actions, text="Modifier",
-       font=("Inter", 10), bg=BLANC, fg=NOIR_TITRE,
-       relief="solid", bd=1, padx=12, pady=5, cursor="hand2",
-       command=lambda: action_modifier()
-       ).grid(row=0, column=0, padx=(0, 8))
-
-Button(frame_actions, text="Supprimer",
-       font=("Inter", 10), bg=BLANC, fg=ROUGE_KO,
-       relief="solid", bd=1, padx=12, pady=5, cursor="hand2",
-       command=lambda: action_supprimer()
-       ).grid(row=0, column=1)
-
-# ============================================================
 # DEMARRAGE
-# ============================================================
 mise_a_jour()
 ma_fenetre.mainloop()
