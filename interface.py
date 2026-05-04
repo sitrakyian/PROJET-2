@@ -253,13 +253,13 @@ def ouvrir_confirmation_suppression(index):
     win.geometry("430x210")
     win.resizable(False, False)
     win.config(bg=BLANC)
-    win.columnconfigure(0, weight=1) # Permet de centrer les éléments dans la fenêtre
+    win.columnconfigure(0, weight=1) 
 
     frame_entete_Supp = Frame(win, bg=BLANC)
     frame_entete_Supp.grid(row=0, column=0, sticky="ew", padx=(12), pady=(12, 4))
     LogoSuppression = PhotoImage(file="IMAGE/attention.png")
     win.LogoSuppression = LogoSuppression
-    Label(frame_entete_Supp, image=LogoSuppression, bg=BLANC).grid(row=0, column=0, padx=(10,0), pady=0, sticky="ew") # sticky="w" pour aligner à gauche
+    Label(frame_entete_Supp, image=LogoSuppression, bg=BLANC).grid(row=0, column=0, padx=(10,0), pady=0, sticky="ew") 
 
     Label(frame_entete_Supp, text="Confirmer la suppression",
           font=("Inter", 14, "bold"),
@@ -277,7 +277,7 @@ def ouvrir_confirmation_suppression(index):
         win.destroy()
 
     frame_btn = Frame(win, bg=BLANC)
-    frame_btn.grid(row=2, column=0, pady=8, sticky="ew") # sticky="ew" pour que le frame des boutons s'étende
+    frame_btn.grid(row=2, column=0, pady=8, sticky="ew")
     
     # Configuration des colonnes du frame des boutons pour centrer les boutons
     frame_btn.columnconfigure(0, weight=1) # Colonne vide à gauche pour pousser les boutons au centre
@@ -287,14 +287,14 @@ def ouvrir_confirmation_suppression(index):
            fg_color=ROUGE_KO, text_color=BLANC, font=("Inter", 12,"bold"), width=140,
            height=35, corner_radius=5, cursor="hand2",
            command=lambda: _confirmer()
-           ).grid(row=0, column=1, padx=12) # Placer le bouton dans la colonne 1
+           ).grid(row=0, column=1, padx=12) 
 
     ctk.CTkButton(frame_btn, text="Non",
            fg_color=GRIS_BOUTON, text_color=NOIR_TITRE, font=("Inter", 12,"bold"), width=100,
            height=35, corner_radius=5, cursor="hand2",
-           command=lambda: win.destroy()).grid(row=0, column=2, padx=12) # Placer le bouton dans la colonne 2
+           command=lambda: win.destroy()).grid(row=0, column=2, padx=12) 
 
-# les actions et interactions éffectuées sur le tableau
+# Actions et interactions éffectuées sur le tableau
 
 def action_modifier():
     sel = tableau.selection()
@@ -357,7 +357,7 @@ sv_services  = StringVar()
 sv_services.set("0 services possibles")
 
 
-# ROW 0 : En-tete
+# LIGNE 0 : En-tete
 frame_entete = ctk.CTkFrame(ma_fenetre,
                             fg_color=BLANC,
                             border_color=GRIS_BORDURE,
