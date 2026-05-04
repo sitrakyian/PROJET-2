@@ -1,18 +1,7 @@
-# ============================================================
-# NOYAU FONCTIONNEL - Projet : Organisation de Repas Partagé
-# ============================================================
-# Ce fichier contient toute la logique métier (données + calculs)
-# Il ne contient AUCUN code tkinter.
-# ============================================================
-
 CATEGORIES = ["Entrees", "Plats", "Desserts", "Boissons"]
 
 participants = []
 
-
-# ------------------------------------------------------------
-# Opérations CRUD
-# ------------------------------------------------------------
 
 def ajouter_participant(nom, prenom, categorie, nom_element, quantite):
     erreur = valider_saisie(nom, prenom, categorie, nom_element, quantite)
@@ -65,9 +54,7 @@ def valider_saisie(nom, prenom, categorie, nom_element, quantite):
     return None
 
 
-# ------------------------------------------------------------
 # Indicateurs
-# ------------------------------------------------------------
 
 def total_participants():
     return len(participants)
@@ -139,10 +126,7 @@ def pourcentage_categorie(categorie):
     return round(ind.get(categorie, 0) / total * 100, 1)
 
 
-# ------------------------------------------------------------
 # Tri
-# ------------------------------------------------------------
-
 def trier(colonne, ordre_croissant=True):
     reverse = not ordre_croissant
     if colonne == "quantite":
